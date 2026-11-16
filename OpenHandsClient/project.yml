@@ -1,0 +1,16 @@
+name: OpenHandsClient
+options:
+  bundleIdPrefix: com.openhands
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  OpenHandsClient:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.openhands.client
+      INFOPLIST_FILE: Sources/Info.plist
+      CODE_SIGN_IDENTITY: ""
+      CODE_SIGNING_REQUIRED: "NO"
+      CODE_SIGNING_ALLOWED: "NO"

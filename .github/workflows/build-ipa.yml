@@ -1,0 +1,47 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ "main", "master", "openhands-*" ]
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: |
+          cd OpenHandsClient
+          xcodegen generate
+
+      - name: Build App for iOS (Unsigned)
+        run: |
+          cd OpenHandsClient
+          xcodebuild -project OpenHandsClient.xcodeproj \
+            -scheme OpenHandsClient \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build
+
+      - name: Package Unsigned IPA
+        run: |
+          cd OpenHandsClient
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/OpenHandsClient.app Payload/
+          zip -r OpenHandsClient.ipa Payload
+          echo "IPA created successfully."
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenHandsClient-IPA
+          path: OpenHandsClient/OpenHandsClient.ipa
