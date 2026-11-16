@@ -27,6 +27,7 @@ jobs:
             -scheme OpenHandsClient \
             -sdk iphoneos \
             -configuration Release \
+            -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -36,7 +37,7 @@ jobs:
         run: |
           cd OpenHandsClient
           mkdir -p Payload
-          cp -r build/Release-iphoneos/OpenHandsClient.app Payload/
+          cp -r build/Build/Products/Release-iphoneos/OpenHandsClient.app Payload/
           zip -r OpenHandsClient.ipa Payload
           echo "IPA created successfully."
 
