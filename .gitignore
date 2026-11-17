@@ -1,0 +1,15 @@
+__pycache__/
+.agents_tmp/
+*.log
+save.json
+cert.pem
+key.pem
+cloudflared
+*.ipa
+extracted_ipa/
+extracted_official/
+.DS_Store
+*.xcodeproj
+*.xcworkspace
+build/
+DerivedData/

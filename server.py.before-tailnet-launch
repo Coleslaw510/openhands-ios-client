@@ -1,0 +1,44 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
+import time
+import os
+
+app = FastAPI(title="Dragon City Offline Mock Server")
+
+@app.get("/")
+def read_root():
+    return {"status": "Dragon City Offline Mock Server Running (3x Faster Timers)", "version": "1.2"}
+
+@app.get("/download")
+def download_ipa():
+    ipa_path = "/workspace/project/dragon_city_offline.ipa"
+    if os.path.exists(ipa_path):
+        return FileResponse(ipa_path, media_type="application/octet-stream", filename="dragon_city_offline.ipa")
+    return {"error": "IPA not found"}, 404
+
+@app.post("/api/v1/user/login")
+async def login(request: Request):
+    return {
+        "success": True,
+        "user": {"id": "12345678", "name": "OfflinePlayer", "level": 50, "gold": 999999999, "food": 999999999, "gems": 99999},
+        "islands": [{"id": 1, "unlocked": True, "habitats": [], "decorations": []}, {"id": 2, "unlocked": True, "habitats": [], "decorations": []}],
+        "dragons": [{"id": 1, "dragon_id": 1, "level": 40, "element": "fire", "star": 5}],
+    }
+
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+async def catch_all(path: str, request: Request):
+    print(f"Intercepted {request.method} /{path}", flush=True)
+    now = int(time.time())
+    duration = 1200  # 3x faster than standard 3600s
+    return {
+        "success": True,
+        "timestamp": now,
+        "complete_time": now + duration,
+        "remaining_time": duration,
+        "data": {},
+        "message": "Offline mock response (3x faster simulated timer)",
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8011)

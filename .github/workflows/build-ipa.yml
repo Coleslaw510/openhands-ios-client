@@ -2,47 +2,58 @@ name: Build iOS IPA
 
 on:
   push:
-    branches: [ "main", "master", "openhands-*" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build-ipa:
-    runs-on: macos-15
+  build:
+    name: Build iOS App and generate IPA
+    runs-on: macos-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen
 
       - name: Generate Xcode Project
-        run: |
-          cd OpenHandsClient
-          xcodegen generate
+        working-directory: ./DragonCityClient
+        run: xcodegen generate
 
-      - name: Build App for iOS (Unsigned)
+      - name: Build iOS App
+        working-directory: ./DragonCityClient
         run: |
-          cd OpenHandsClient
-          xcodebuild -project OpenHandsClient.xcodeproj \
-            -scheme OpenHandsClient \
-            -sdk iphoneos \
-            -configuration Release \
-            -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            clean build
+          xcodebuild -project DragonCityClient.xcodeproj \
+                     -scheme DragonCityClient \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -derivedDataPath build \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO \
+                     build
 
-      - name: Package Unsigned IPA
+      - name: Package IPA
         run: |
-          cd OpenHandsClient
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/OpenHandsClient.app Payload/
-          zip -r OpenHandsClient.ipa Payload
-          echo "IPA created successfully."
+          APP_PATH=$(find DragonCityClient/build -name "DragonCityClient.app" -type d | head -n 1)
+          if [ -d "$APP_PATH" ]; then
+            cp -r "$APP_PATH" Payload/
+            zip -r DragonCityClient.ipa Payload/
+            ls -la DragonCityClient.ipa
+          else
+            echo "App not found!"
+            exit 1
+          fi
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: OpenHandsClient-IPA
-          path: OpenHandsClient/OpenHandsClient.ipa
+          name: DragonCityClient-IPA
+          path: DragonCityClient.ipa

@@ -1,0 +1,40 @@
+{
+  "user": {
+    "id": "12345678",
+    "userId": "12345678",
+    "name": "OfflinePlayer",
+    "level": 1,
+    "gold": 500,
+    "food": 200,
+    "gems": 10,
+    "hardCurrency": 10,
+    "softCurrency": 500
+  },
+  "profile": {
+    "id": "12345678",
+    "name": "OfflinePlayer",
+    "level": 1
+  },
+  "player": {
+    "id": "12345678",
+    "name": "OfflinePlayer",
+    "level": 1
+  },
+  "islands": [
+    {
+      "id": 1,
+      "unlocked": true,
+      "habitats": [],
+      "decorations": []
+    }
+  ],
+  "dragons": [
+    {
+      "id": 1,
+      "dragon_id": 1,
+      "level": 1,
+      "element": "fire",
+      "star": 1
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon City - Open Source Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: radial-gradient(circle at center, #1b2838 0%, #0d1117 100%); color: #fff; min-height: 100vh; overflow-x: hidden; }
+        .title-font { font-family: 'Cinzel', serif; }
+        .island-bg { background: linear-gradient(135deg, #23452c 0%, #172d1d 50%, #0f1f14 100%); border: 3px solid #3b7a57; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .card-bg { background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(10px); border: 1px solid #30363d; }
+        .glow-gold { text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- Top Header / Resource Bar -->
+    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center bg-gray-900/90 border border-gray-700 rounded-2xl p-4 mb-6 shadow-2xl backdrop-blur-md">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center text-2xl shadow-lg border-2 border-amber-300">
+                🐉
+            </div>
+            <div>
+                <h1 class="title-font text-2xl text-amber-400 font-bold tracking-wider" id="username">DragonMaster</h1>
+                <div class="text-xs text-gray-300 flex items-center space-x-2">
+                    <span class="bg-indigo-600 px-2 py-0.5 rounded-full font-semibold" id="user-level">Level 3</span>
+                    <span>XP: <span id="user-xp">450</span>/<span id="user-next-xp">1000</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="flex items-center space-x-4 md:space-x-6">
+            <div class="flex items-center space-x-2 bg-gray-800 px-3 py-1.5 rounded-xl border border-amber-500/40 shadow-inner">
+                <span class="text-xl">🪙</span>
+                <span class="font-bold text-amber-300 text-lg" id="res-gold">5000</span>
+            </div>
+            <div class="flex items-center space-x-2 bg-gray-800 px-3 py-1.5 rounded-xl border border-emerald-500/40 shadow-inner">
+                <span class="text-xl">🍖</span>
+                <span class="font-bold text-emerald-300 text-lg" id="res-food">2500</span>
+            </div>
+            <div class="flex items-center space-x-2 bg-gray-800 px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-inner">
+                <span class="text-xl">💎</span>
+                <span class="font-bold text-cyan-300 text-lg" id="res-gems">50</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Arena -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left & Center: Island & Habitats (2 columns on large screens) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Floating Island -->
+            <div class="island-bg rounded-3xl p-6 relative min-h-[420px] flex flex-col justify-between">
+                <div class="flex justify-between items-center border-b border-emerald-800/60 pb-3">
+                    <h2 class="title-font text-xl text-emerald-300 font-bold flex items-center gap-2">
+                        🏝️ <span id="island-name">Starter Dragon Island</span>
+                    </h2>
+                    <button onclick="buyHabitat()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-lg transition transform hover:scale-105">
+                        🏗️ Build Habitat (🪙 1000)
+                    </button>
+                </div>
+
+                <!-- Habitats Grid -->
+                <div id="habitats-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="text-xs text-emerald-400/80 text-center italic">
+                    ✨ Tap habitats to collect gold and grow your dragon empire! Fully self-hosted open source edition.
+                </div>
+            </div>
+
+            <!-- Farms Section -->
+            <div class="card-bg rounded-3xl p-6 shadow-xl">
+                <h3 class="title-font text-lg text-emerald-400 font-bold mb-4 flex items-center gap-2">
+                    🌾 Dragon Food Farms
+                </h3>
+                <div id="farms-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Dragons, Hatchery, Actions -->
+        <div class="space-y-6">
+            
+            <!-- Hatchery -->
+            <div class="card-bg rounded-3xl p-6 shadow-xl">
+                <h3 class="title-font text-lg text-cyan-400 font-bold mb-4 flex items-center gap-2">
+                    🥚 Dragon Hatchery
+                </h3>
+                <div id="hatchery-container" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+                <button onclick="breedDragons()" class="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-2.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center justify-center gap-2">
+                    ❤️ Breed Dragons (💎 50)
+                </button>
+            </div>
+
+            <!-- Dragon Collection -->
+            <div class="card-bg rounded-3xl p-6 shadow-xl">
+                <h3 class="title-font text-lg text-amber-400 font-bold mb-4 flex items-center gap-2">
+                    🐉 Dragon Sanctuary (<span id="dragon-count">1</span>)
+                </h3>
+                <div id="dragons-container" class="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl transform translate-y-32 opacity-0 transition-all duration-300 font-semibold z-50">
+        Action successful!
+    </div>
+
+    <script>
+        let gameState = {};
+
+        async function fetchState() {
+            try {
+                const res = await fetch('/api/state');
+                gameState = await res.json();
+                renderGame();
+            } catch (err) {
+                console.error("Failed to load state", err);
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = `fixed bottom-6 right-6 px-6 py-3 rounded-2xl shadow-2xl transform translate-y-0 opacity-100 transition-all duration-300 font-semibold z-50 ${isError ? 'bg-red-600' : 'bg-emerald-600'}`;
+            setTimeout(() => {
+                toast.className = 'fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl transform translate-y-32 opacity-0 transition-all duration-300 font-semibold z-50';
+            }, 3000);
+        }
+
+        function renderGame() {
+            const u = gameState.user;
+            document.getElementById('username').innerText = u.name;
+            document.getElementById('user-level').innerText = `Level ${u.level}`;
+            document.getElementById('user-xp').innerText = u.xp;
+            document.getElementById('user-next-xp').innerText = u.next_level_xp;
+            document.getElementById('res-gold').innerText = u.gold.toLocaleString();
+            document.getElementById('res-food').innerText = u.food.toLocaleString();
+            document.getElementById('res-gems').innerText = u.gems.toLocaleString();
+
+            document.getElementById('island-name').innerText = gameState.islands[0].name;
+
+            // Render Habitats
+            const habContainer = document.getElementById('habitats-container');
+            habContainer.innerHTML = '';
+            gameState.islands[0].habitats.forEach(hab => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-800/80 border border-emerald-700/50 rounded-2xl p-4 flex flex-col justify-between shadow-md hover:border-emerald-500 transition';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-bold text-emerald-300">${hab.name}</h4>
+                            <span class="text-xs text-gray-400">Type: ${hab.type.toUpperCase()} | Level ${hab.level}</span>
+                        </div>
+                        <span class="text-2xl">🏡</span>
+                    </div>
+                    <div class="my-2 bg-gray-900/70 p-2 rounded-xl text-xs flex justify-between items-center">
+                        <span>Gold: <strong class="text-amber-400">${hab.gold_stored}</strong> / ${hab.max_gold}</span>
+                        <button onclick="collectGold(${hab.id})" class="bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold px-3 py-1 rounded-lg text-xs shadow transition">Collect</button>
+                    </div>
+                    <div class="text-xs text-gray-400">Dragons inside: ${hab.dragons.length} / ${hab.capacity}</div>
+                `;
+                habContainer.appendChild(div);
+            });
+
+            // Render Dragons
+            const dragonContainer = document.getElementById('dragons-container');
+            dragonContainer.innerHTML = '';
+            document.getElementById('dragon-count').innerText = gameState.dragons.length;
+            gameState.dragons.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-800/90 border border-gray-700 rounded-xl p-3 flex items-center justify-between shadow';
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl bg-gray-900 p-2 rounded-xl">${d.icon}</span>
+                        <div>
+                            <h5 class="font-bold text-amber-300 text-sm">${d.name}</h5>
+                            <span class="text-xs text-gray-400">Level ${d.level} • +${d.gold_per_min} gold/min</span>
+                        </div>
+                    </div>
+                    <button onclick="feedDragon(${d.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow transition">Feed (🍖100)</button>
+                `;
+                dragonContainer.appendChild(div);
+            });
+
+            // Render Hatchery
+            const hatcheryContainer = document.getElementById('hatchery-container');
+            hatcheryContainer.innerHTML = '';
+            if (gameState.hatchery.length === 0) {
+                hatcheryContainer.innerHTML = '<div class="text-xs text-gray-400 text-center py-4">Hatchery is empty. Breed dragons to get eggs!</div>';
+            } else {
+                gameState.hatchery.forEach(egg => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-800/90 border border-cyan-800/60 rounded-xl p-3 flex items-center justify-between shadow';
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <span class="text-3xl bg-gray-900 p-2 rounded-xl">${egg.icon}</span>
+                            <div>
+                                <h5 class="font-bold text-cyan-300 text-sm">${egg.egg_name}</h5>
+                                <span class="text-xs text-gray-400">Ready to hatch!</span>
+                            </div>
+                        </div>
+                        <button onclick="hatchEgg(${egg.id})" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow transition">Hatch</button>
+                    `;
+                    hatcheryContainer.appendChild(div);
+                });
+            }
+
+            // Render Farms
+            const farmsContainer = document.getElementById('farms-container');
+            farmsContainer.innerHTML = '';
+            gameState.farms.forEach(farm => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-800/80 border border-emerald-700/50 rounded-2xl p-4 flex flex-col justify-between shadow-md';
+                let actionHtml = '';
+                if (farm.status === 'ready') {
+                    actionHtml = `<button onclick="harvestFarm(${farm.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow transition">Harvest (${farm.yield} 🍖)</button>`;
+                } else {
+                    actionHtml = `<button onclick="plantFarm(${farm.id})" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow transition">Plant Crop (🪙 200)</button>`;
+                }
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-emerald-300 text-sm">Farm #${farm.id} (Level ${farm.level})</h4>
+                        <span class="text-xl">🌾</span>
+                    </div>
+                    <div class="text-xs text-gray-300 mb-3">Status: <span class="font-semibold text-amber-400">${farm.status.toUpperCase()}</span> ${farm.crop ? '• ' + farm.crop : ''}</div>
+                    ${actionHtml}
+                `;
+                farmsContainer.appendChild(div);
+            });
+        }
+
+        async function collectGold(habitatId) {
+            const res = await fetch('/api/action/collect_gold', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({habitat_id: habitatId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Collected 🪙 ${data.collected} gold!`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Failed', true);
+            }
+        }
+
+        async function feedDragon(dragonId) {
+            const res = await fetch('/api/action/feed_dragon', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dragon_id: dragonId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Fed dragon! Level increased! 🚀`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Not enough food!', true);
+            }
+        }
+
+        async function harvestFarm(farmId) {
+            const res = await fetch('/api/action/harvest_farm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({farm_id: farmId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Harvested 🍖 ${data.harvested} food!`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Failed', true);
+            }
+        }
+
+        async function plantFarm(farmId) {
+            const res = await fetch('/api/action/plant_farm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({farm_id: farmId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Planted crops successfully! 🌾`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Not enough gold!', true);
+            }
+        }
+
+        async function hatchEgg(eggId) {
+            const res = await fetch('/api/action/hatch_egg', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({egg_id: eggId})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Successfully hatched ${data.new_dragon.name}! 🎉`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Failed', true);
+            }
+        }
+
+        async function buyHabitat() {
+            const types = ['nature', 'water', 'electric', 'dark', 'ice'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const res = await fetch('/api/action/buy_habitat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: type})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Built new ${type.toUpperCase()} Habitat! 🏡`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Not enough gold!', true);
+            }
+        }
+
+        async function breedDragons() {
+            const res = await fetch('/api/action/breed', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dragon1_id: 1, dragon2_id: 1})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`Breeding complete! New egg added to Hatchery! 🥚✨`);
+                fetchState();
+            } else {
+                showToast(data.error || 'Not enough gems!', true);
+            }
+        }
+
+        // Poll state every 5 seconds
+        setInterval(fetchState, 5000);
+        fetchState();
+    </script>
+</body>
+</html>

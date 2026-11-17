@@ -1,0 +1,53 @@
+from fastapi import FastAPI, Request, Response
+import json
+import time
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"status": "Dragon City Offline Mock Server Running", "version": "1.0"}
+
+@app.post("/api/v1/user/login")
+async def login(request: Request):
+    return {
+        "success": True,
+        "user": {
+            "id": "12345678",
+            "name": "OfflinePlayer",
+            "level": 50,
+            "gold": 999999999,
+            "food": 999999999,
+            "gems": 99999,
+        },
+        "islands": [
+            {"id": 1, "unlocked": True, "habitats": [], "decorations": []},
+            {"id": 2, "unlocked": True, "habitats": [], "decorations": []}
+        ],
+        "dragons": [
+            {"id": 1, "dragon_id": 1, "level": 40, "element": "fire", "star": 5}
+        ]
+    }
+
+@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def catch_all(path: path, request: Request):
+    print(f"Intercepted API call: /{path}")
+    current_time = int(time.time())
+    
+    # Scaled timers: Make timers 10x faster than original game instead of instant.
+    # If client asks for or expects a completion time, scale remaining time by 1/10th.
+    original_duration = 3600  # Default 1 hour simulation
+    scaled_duration = max(10, original_duration // 10)  # 6 minutes instead of 60 minutes
+    
+    return {
+        "success": True,
+        "timestamp": current_time,
+        "complete_time": current_time + scaled_duration,
+        "remaining_time": scaled_duration,
+        "data": {},
+        "message": "Scaled timer mock response (10x faster)"
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,0 +1,114 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, JSONResponse
+import time
+import os
+import json
+
+app = FastAPI(title="Dragon City Offline Mock Server")
+
+SAVE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "save.json")
+
+def load_save():
+    if os.path.exists(SAVE_FILE):
+        try:
+            with open(SAVE_FILE, "r") as f:
+                return json.load(f)
+        except:
+            pass
+    # Default initial state: Level 1 start with starter resources
+    default_state = {
+        "user": {
+            "id": "12345678",
+            "userId": "12345678",
+            "name": "OfflinePlayer",
+            "level": 1,
+            "gold": 500,
+            "food": 200,
+            "gems": 10,
+            "hardCurrency": 10,
+            "softCurrency": 500,
+        },
+        "profile": {
+            "id": "12345678",
+            "name": "OfflinePlayer",
+            "level": 1,
+        },
+        "player": {
+            "id": "12345678",
+            "name": "OfflinePlayer",
+            "level": 1,
+        },
+        "islands": [
+            {"id": 1, "unlocked": True, "habitats": [], "decorations": []}
+        ],
+        "dragons": [
+            {"id": 1, "dragon_id": 1, "level": 1, "element": "fire", "star": 1}
+        ]
+    }
+    save_state(default_state)
+    return default_state
+
+def save_state(state):
+    with open(SAVE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+@app.get("/")
+def read_root():
+    return {"status": "Dragon City Offline Mock Server Running", "version": "1.4"}
+
+@app.get("/download")
+def download_ipa():
+    ipa_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dragon_city_offline.ipa")
+    if os.path.exists(ipa_path):
+        return FileResponse(ipa_path, media_type="application/octet-stream", filename="dragon_city_offline.ipa")
+    return {"error": "IPA not found"}, 404
+
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+async def catch_all(path: str, request: Request):
+    print(f"\n=== Incoming {request.method} /{path} ===", flush=True)
+    try:
+        body = await request.body()
+        if body:
+            print(f"Request Body: {body[:1000].decode('utf-8', errors='ignore')}", flush=True)
+    except Exception as e:
+        print(f"Error reading body: {e}", flush=True)
+
+    state = load_save()
+    now = int(time.time())
+    duration = 1200  # 3x faster timers
+
+    # Social Point standard game server response envelope
+    response_data = {
+        "status": 0,
+        "error": 0,
+        "success": True,
+        "code": 200,
+        "timestamp": now,
+        "complete_time": now + duration,
+        "remaining_time": duration,
+        "result": {
+            "user": state["user"],
+            "player": state["player"],
+            "profile": state["profile"],
+            "islands": state["islands"],
+            "dragons": state["dragons"],
+            "serverTime": now,
+        },
+        "user": state["user"],
+        "profile": state["profile"],
+        "player": state["player"],
+        "islands": state["islands"],
+        "dragons": state["dragons"],
+        "data": {
+            "user": state["user"],
+            "player": state["player"],
+            "islands": state["islands"],
+            "dragons": state["dragons"]
+        },
+        "message": "OK"
+    }
+    return JSONResponse(content=response_data)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8011)

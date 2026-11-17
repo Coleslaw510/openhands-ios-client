@@ -1,0 +1,11 @@
+name: DragonCityClient
+options:
+  bundleIdPrefix: com.opensource.dragoncity
+targets:
+  DragonCityClient:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources: [Sources]
+    settings:
+      INFOPLIST_FILE: Sources/Info.plist
